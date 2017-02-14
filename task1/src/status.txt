@@ -8,3 +8,7 @@ Untracked files:
 	../
 
 nothing added to commit but untracked files present (use "git add" to track)
+
+
+On branch master
+nothing to commit, working directory clean

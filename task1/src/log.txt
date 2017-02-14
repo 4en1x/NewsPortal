@@ -1,0 +1,11 @@
+commit 68db575c4c442f01f21200ca9876ce83908c270f
+Author: 4en1x <free_playerq@mail.ru>
+Date:   Tue Feb 14 20:19:41 2017 +0300
+
+    add .gitignore
+
+commit 30f0bb69d1389b02455c4f7c8b6cf129fb9e7499
+Author: 4en1x <free_playerq@mail.ru>
+Date:   Tue Feb 14 20:16:53 2017 +0300
+
+    add .gitignore
