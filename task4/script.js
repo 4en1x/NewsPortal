@@ -1,3 +1,4 @@
+"use strict";
 var articles = [
   {
     id: '1',
@@ -113,9 +114,7 @@ function getArticles(skip,top,filterConfig){
       _articles = _articles.filter(function (param) {
           var _count=_tags.length;
           for(var i=0;i<param.tags.length;i++){
-              for(var j=0;j<_tags.length;j++){
-                  if(param.tags[i]===_tags[j]) _count--;
-              }
+              if(param.tags.indexOf(_tags[i])!==-1) _count--;
           }
           if(_count==0) return true;
           return false;
@@ -125,10 +124,7 @@ function getArticles(skip,top,filterConfig){
 };
 function getArticle(id) {
     if(id===undefined)return undefined;
-    for (var i = 0; i < articles.length; i++) {
-        if (articles[i].id == id) return articles[i];
-    }
-    return undefined;
+    return articles.find(function (param) {return param.id===id;});
 };
 function validateArticle(article,withoutID) {
     if(typeof article.title !== 'string'||article.title.length<=0||article.title.length>100) return false;
@@ -156,17 +152,19 @@ function addArticle(article) {
     return false;
 };
 function editArticle(id,article) {
-    var _article;
-    if((_article=getArticle(id))===undefined)return false;
+    var _article={};
+    var _clone;
+    if((_clone=getArticle(id))===undefined)return false;
+    for (var key in _clone) {
+        _article[key] = _clone[key];
+    }
     if(article.title!==undefined) _article.title=article.title;
     if(article.summary!==undefined) _article.summary=article.summary;
     if(article.content!==undefined) _article.content=article.content;
     if(article.tags!==undefined) _article.tags=article.tags;
     if(validateArticle(_article,"")===true){
-        getArticle(id).title=_article.title;
-        getArticle(id).summary=_article.summary;
-        getArticle(id).content=_article.content;
-        getArticle(id).tags=_article.tags;
+        removeArticle(id);
+        addArticle(_article);
         return true;
     }
     return false;
