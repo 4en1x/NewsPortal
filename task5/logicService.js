@@ -12,6 +12,7 @@ var logicService = (function () {
         timezone: 'UTC'
     };
     var tagsToAddOrEdit = [];
+    window.onload = () =>init();
     function showOneNews(id) {
         var newsList = document.getElementsByClassName("data-content")[0];
         document.getElementsByClassName("main-header-links")[0].children[2].style.display = "";
@@ -64,7 +65,7 @@ var logicService = (function () {
     };
     function addArticle(myContent, url) {
         if(globalUserName===undefined)return;
-        if (articlesService.addArticle(myContent) && articlesService.addnewImage(myContent.id, url)) {
+        if (articlesService.addArticle(myContent) && articlesService.addNewImage(myContent.id, url)) {
             alert("Успешно");
             currentCount = 0;
             cleanPage();

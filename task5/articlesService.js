@@ -204,46 +204,25 @@ var articlesService = (function () {
         {id: "18", url: "Images/9.jpg"},
         {id: "19", url: "Images/2.jpg"},
         {id: "20", url: "Images/13.jpg"}];
-
-    function getArticles(skip, top, filterConfig) {
-        skip = skip || 0;
-        top = top || 10;
-        if (filterConfig !== undefined) {
-            var _author = filterConfig.author || "";
-            var _beginDate = filterConfig.beginDate || new Date(-8640000000000000);
-            var _endDate = filterConfig.endDate || new Date(8640000000000000);
-            var _tags = filterConfig.tags;
-        }
+    var getArticles=(skip=0, top=10, filterConfig={})=> {
+        var _author = filterConfig.author || "";
+        var _beginDate = filterConfig.beginDate || new Date(-8640000000000000);
+        var _endDate = filterConfig.endDate || new Date(8640000000000000);
+        var _tags = filterConfig.tags;
         var _articles = articles;
-        if (filterConfig !== undefined) {
-            _articles = _articles.filter(function (param) {
-                return param.author.indexOf(_author) > -1;
-            });
-            _articles = _articles.filter(function (param) {
-                return param.createdAt >= _beginDate && param.createdAt <= _endDate;
-            });
-        }
-        if (_tags !== undefined) {
-            _articles = _articles.filter(function (param) {
-                var _count = _tags.length;
-                for (var i = 0; i < param.tags.length; i++) {
-                    if (param.tags.indexOf(_tags[i]) !== -1) _count--;
-                }
-                if (_count == 0) return true;
-                return false;
-            });
-        }
-        return _articles.sort(function (a, b) {
-            return b.createdAt - a.createdAt
-        }).slice(skip, skip + top);
+        _articles = _articles.filter(param=>param.author.indexOf(_author)>-1);
+        _articles = _articles.filter(param=>param.createdAt >= _beginDate && param.createdAt <= _endDate);
+        if(_tags!==undefined) {_articles = _articles.filter((param)=> {
+            for (var i = 0; i < _tags.length; i++) {if (param.tags.indexOf(_tags[i]) === -1)return false;}
+            return true;
+        });};
+        return _articles.sort((a, b)=>b.createdAt - a.createdAt).slice(skip, skip + top);
     };
-    function getArticle(id) {
-        if (id === undefined)return undefined;
-        return articles.find(function (param) {
-            return param.id === id;
-        });
-    };
-    function validateArticle(article, withoutID) {
+    var getArticle=(id) =>articles.find(param=>param.id === id);
+    var inTags=(tag)=>tags.find(param=>param === tag);
+    var getImage=(id)=> images.find(param=>param.id === id);
+    var addNewImage=(id, url)=> images.push({id: id, url: url});
+    var validateArticle=(article, withoutID)=> {
         if (typeof article.title !== 'string' || article.title.length <= 0 || article.title.length > 100) return false;
         if (typeof article.summary !== 'string' || article.summary.length <= 0 || article.summary.length > 200) return false;
         if (withoutID === undefined && (typeof article.id !== 'string' || article.id.length <= 0 || getArticle(article.id) !== undefined)) return false;
@@ -251,82 +230,39 @@ var articlesService = (function () {
         if (typeof article.author !== 'string' || article.author.length <= 0) return false;
         if (typeof article.content !== 'string' || article.content.length <= 0) return false;
         if (article.tags.length <= 0) return false;
-        for (var i = 0; i < article.tags.length; i++) {
-            var count = 0;
-            for (var j = 0; j < tags.length; j++) {
-                if (tags[j] === article.tags[i])
-                    count++;
-            }
-            if (count === 0) return false;
-        }
+        for (var i = 0; i < article.tags.length; i++) {if(tags.indexOf(article.tags[i])===-1) return false;}
         return true;
     };
-    function addArticle(article) {
-        if (validateArticle(article) === true) {
-            articles.push(article);
-            return true;
-        }
+    var addArticle=(article)=>{
+        if (validateArticle(article)) {articles.push(article);return true;}
         return false;
     };
-    function editArticle(id, article) {
-        var _article = {};
+    var editArticle=(id, article)=> {
         var _clone;
         if ((_clone = getArticle(id)) === undefined)return false;
-        for (var key in _clone) {
-            _article[key] = _clone[key];
-        }
+        var _article=Object.assign(_clone);
         if (article.title !== undefined) _article.title = article.title;
         if (article.summary !== undefined) _article.summary = article.summary;
         if (article.content !== undefined) _article.content = article.content;
         if (article.tags !== undefined) _article.tags = article.tags;
-        if (validateArticle(_article, "") === true) {
-            removeArticle(id);
-            addArticle(_article);
-            return true;
-        }
+        if (validateArticle(_article, "")){removeArticle(id);addArticle(_article);return true;}
         return false;
     };
-    function inTags(tag) {
-        for (var i = 0; i < tags.length; i++) {
-            if (tags[i] === tag) return i;
-        }
-        return -1;
-    };
-    function addTag(tag) {
-        if (inTags(tag) === -1) {
-            tags.push(tag);
-            return true;
-        }
+    var addTag=(tag)=> {
+        if (inTags(tag) === undefined) {tags.push(tag);return true;}
         return false;
     };
-    function deleteTag(tag) {
+    var deleteTag=(tag)=> {
         var x = inTags(tag);
-        if (x !== -1) {
-            tags.splice(x, 1);
-            return true;
-        }
+        if (inTags(tag) !== undefined) {tags.splice(x, 1);return true;}
         return false;
     };
-    function removeArticle(id) {
-        var x;
-        for (var i = 0; i < articles.length; i++) {
-            if (articles[i].id == id) x = i;
-        }
+    var removeArticle=(id)=> {
+        var x=articles.findIndex(param=>param.id === id);
         if (x === undefined) return false;
         articles.splice(x, 1);
         return true;
     };
-    function getImage(id) {
-        if (id === undefined)return undefined;
-        return images.find(function (param) {
-            return param.id === id;
-        });
-    };
-    function addnewImage(id, url) {
-        images.push({id: id, url: url});
-        return true;
-    };
-
     return {
         getArticles: getArticles,
         getArticle: getArticle,
@@ -338,6 +274,6 @@ var articlesService = (function () {
         deleteTag: deleteTag,
         removeArticle: removeArticle,
         getImage: getImage,
-        addnewImage: addnewImage
+        addNewImage: addNewImage
     };
 }());
