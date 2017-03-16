@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="index.css">
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="../JS/articlesService.js"></script>
+    <script src="../JS/logicService.js"></script>
+</head>
+<body>
+    <div class="main-header">
+        <img src="Images/1.png" alt="logo">
+        <div class='search-link'>
+            <a id="link-search" href="">Search</a>
+            <div class="search-panel">
+                <a class="clear-filter">Очистить фильтр</a>
+                <p>Имя автора:</p>
+                <div class="search" id="author-search">
+                    <input type="search" placeholder="Поиск по автору" class="input" />
+                </div>
+                <p>Дата:</p>
+                <div class="search" id="date-search">
+                    <input type="search" placeholder="Дата начала mm/dd/yyyy" class="input" />
+                    <p></p>
+                    <input type="search" placeholder="Дата конца mm/dd/yyyy" class="input" />
+                </div>
+                <p>Теги:</p>
+                <select multiple class="search-tag"></select>
+
+                <a href="#" class="myButton" id="myButton">Поиск!</a>
+            </div>
+        </div>
+        <div class="main-header-links">
+            <label for="modal" id="link-login">Login</label>
+            <a id="link-logout">Logout</a>
+            <a  id="link-add-news">Add news</a>
+            <a  id="link-main-page">Main page</a>
+        </div>
+        <div class="username"></div>
+        <h1>My Super News Portal</h1>
+        <p>Excelent news every day!</p>
+    </div>
+    <div class="modal">
+        <input class="modal-open" id="modal" type="checkbox" hidden>
+        <div class="modal-wrap" aria-hidden="true" role="dialog">
+            <label class="modal-overlay" for="modal"></label>
+            <div class="modal-dialog">
+                <div class="loginForm">
+                    <div class="field">
+                        <label>Имя пользователя:</label>
+                        <input id="login-name" type="text" placeholder="Login" />
+                    </div>
+                    <div class="field">
+                        <label>Пароль:</label>
+                        <input id="login-password" type="password" placeholder="Password" />
+                    </div>
+                    <div class="submit">
+                        <button id="login-submit">Войти</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="data-content">
+        <div class="load-more"><a class="load-more-button">Load more</a></div>
+    </div>
+    <template id="single-news-template">
+        <div class="single-news">
+            <div class="image-header"><img src="" alt=""></div>
+            <h1></h1>
+            <p></p>
+            <a class="show-one-news">Раскрыть новость...</a>
+            <span class="author"></span>
+            <time class="post-date"></time>
+            <span class="redact-buttons">
+                <a class="tick"></a>
+                <a class="cross"></a>
+            </span>
+        </div>
+    </template>
+    <template id="one-news-template">
+        <h1></h1>
+        <div class="one-page">
+            <span class="author"></span>
+            <time class="post-date"></time>
+            <span class="redact-buttons">
+                <a class="tickInOnePage"></a>
+                <a class="crossInOnePage"></a>
+            </span>
+        </div>
+    </template>
+    <template id="add-news-template">
+        <div class="single-news">
+            <h1>Добавить новость</h1>
+            <p><textarea id="add-title-textarea" rows="4" cols="100" name="text" placeholder="Некое заглавие новости"></textarea></p>
+            <p><textarea id="add-summary-textarea" rows="10" cols="100" name="text" placeholder="Краткий текст новости"></textarea></p>
+            <p><textarea id="add-content-textarea" rows="10" cols="100" name="text" placeholder="Полный текст новости"></textarea></p>
+            <p><textarea id="add-url-textarea" rows="4" cols="100" name="text" placeholder="url картинки"></textarea></p>
+            <p><input type="text" size="99" placeholder="Поле для ввода тегов(по нажатию на enter)" class="tags-input" ></p>
+            <button class="add-news-button">Добавить новость</button>
+        </div>
+    </template>
+    <template id="change-news-template">
+        <div class="single-news">
+            <h1>Изменить новость</h1>
+            <p><textarea id="change-title-textarea" rows="4" cols="100" name="text" placeholder="Некое заглавие новости"></textarea></p>
+            <p><textarea id="change-summary-textarea" rows="10" cols="100" name="text" placeholder="Краткий текст новости"></textarea></p>
+            <p><textarea id="change-content-textarea" rows="10" cols="100" name="text" placeholder="Полный текст новости"></textarea></p>
+            <p><textarea id="change-url-textarea" rows="4" cols="100" name="text" placeholder="url картинки"></textarea></p>
+            <p><input type="text" size="99" placeholder="Поле для ввода тегов(по нажатию на enter)" class="tags-input" ></p>
+            <button class="add-news-button">Изменить новость</button>
+            <button class="step-forward-button">Вернуться обратно</button>
+        </div>
+    </template>
+    <div class="page-footer">
+        <p><i>Super News Portal | Стефанович Константин | 2 курс , 6 группа | Contact : <a href="mailto:freeplayercot@gmail.com">freeplayercot@gmail.com</a> | 17.02.2017</i></p>
+    </div>
+</body>
+</html>
