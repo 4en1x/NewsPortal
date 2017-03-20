@@ -133,12 +133,20 @@
     var addOneMoreTagToList=(newTag)=> {
         tagsToAddOrEdit.push(newTag.value);
         var myP = document.createElement("p");
+        myP.className="tags-to-add-or-edit";
         myP.innerHTML = "# " + newTag.value;
         myP.addEventListener('click',()=>{
             myP.style.display = 'none';
             tagsToAddOrEdit.forEach((param,index)=> {
                 if (param === myP.innerHTML.substring(2)) tagsToAddOrEdit.splice(index, 1);
             });
+        });
+        myP.oncontextmenu=()=>{ return false;}/*Если что,тут это специально,чтобы вызывался только мой обработчик без контекстного меню.Хотя может проще можно*/
+        myP.addEventListener('contextmenu',()=>{
+            if (confirm("Добавить данный тег в список доступных?")) {
+                articlesService.addTag(event.target.innerHTML.substring(2))
+                localStorage.setItem("tags", JSON.stringify(articlesService.getTags()));
+            }
         });
         document.getElementsByClassName("single-news")[0].insertBefore(myP, newTag.parentNode.nextElementSibling);
         newTag.value = "";
@@ -263,12 +271,20 @@
         for (var i = 0; i < article.tags.length; i++) {
             let myP = document.createElement("p");
             tagsToAddOrEdit.push(article.tags[i]);
+            myP.className="tags-to-add-or-edit";
             myP.innerHTML = "# " + article.tags[i];
             myP.addEventListener('click',()=>{
                 myP.style.display = 'none';
                 tagsToAddOrEdit.forEach((param,index)=> {
                     if (param === myP.innerHTML.substring(2)) tagsToAddOrEdit.splice(index, 1);
                 });
+            });
+            myP.oncontextmenu=()=>{ return false;}
+            myP.addEventListener('contextmenu',()=>{
+                if (confirm("Добавить данный тег в список доступных?")) {
+                    articlesService.addTag(event.target.innerHTML.substring(2))
+                    localStorage.setItem("tags", JSON.stringify(articlesService.getTags()));
+                }
             });
             elem.firstElementChild.insertBefore(myP, elem.firstElementChild.getElementsByClassName("add-news-button")[0]);
         }

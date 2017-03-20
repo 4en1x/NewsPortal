@@ -209,6 +209,7 @@ var articlesService = (function () {
         {id: "19", url: "Images/2.jpg"},
         {id: "20", url: "Images/13.jpg"}];
     images =(JSON.parse(localStorage.getItem("images")))||images ;
+    tags =(JSON.parse(localStorage.getItem("tags")))||tags ;
     var getArticles=(skip=0, top=10, filterConfig={})=> {
         var _author = filterConfig.author || "";
         var _beginDate = filterConfig.beginDate || new Date(-8640000000000000);
@@ -272,7 +273,8 @@ var articlesService = (function () {
     var toLocaleStorage=()=> {
         localStorage.setItem("articles", JSON.stringify(articles));
         localStorage.setItem("images", JSON.stringify(images));
-    }
+        localStorage.setItem("tags", JSON.stringify(tags));
+    };
     return {
         getArticles: getArticles,
         getArticle: getArticle,
