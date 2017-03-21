@@ -1,0 +1,22 @@
+{
+  "name": "news-portal",
+  "version": "1.0.0",
+  "description": "just simple news portal",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4en1x/NewsPortal.git"
+  },
+  "author": "DarkLoS",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/4en1x/NewsPortal/issues"
+  },
+  "homepage": "https://github.com/4en1x/NewsPortal#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}
