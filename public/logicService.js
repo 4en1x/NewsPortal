@@ -18,6 +18,7 @@
         globalUserName=JSON.parse(localStorage.getItem("globalUserName"));
         init();
         document.getElementsByClassName('data-content')[0].addEventListener('click', eventsInDataContent);
+        document.getElementsByClassName('data-content')[0].addEventListener('contextmenu',eventsOnContextMenu);
         document.body.addEventListener('keydown', eventsOnEnter);
         document.getElementsByClassName("myButton")[0].addEventListener('click',()=> filter());
         document.getElementsByClassName('search-tag')[0].addEventListener('change', (e)=> filterConfig.tags = [].slice.call(e.target.selectedOptions).map(a => a.value));
@@ -37,6 +38,14 @@
         } );
     };
     document.addEventListener("DOMContentLoaded", documentReady);
+    var eventsOnContextMenu=()=>{
+        if(event.target.className === 'tags-to-add-or-edit'){
+            if (confirm("Добавить данный тег в список доступных?")) {
+                articlesService.addTag(event.target.innerHTML.substring(2))
+                localStorage.setItem("tags", JSON.stringify(articlesService.getTags()));
+            }
+        }
+    };
     var eventsInDataContent=()=>{
         if (event.target.className === 'cross')clickToRemoveArticle(event.target)
         else if(event.target.className === 'tick')showWindowEditNews(event.target)
@@ -44,6 +53,17 @@
         else if(event.target.className === 'tickInOnePage')editArticleInOnePage(event.target)
         else if(event.target.className === 'show-one-news')showOneNews(event.target.parentNode.id)
         else if(event.target.className === 'load-more-button')init()
+        else if(event.target.className === 'step-forward-button'){
+            cleanPage();
+            currentCount = 0;
+            init();
+        }
+        else if(event.target.className === 'tags-to-add-or-edit'){
+            event.target.style.display = 'none';
+            tagsToAddOrEdit.forEach((param,index)=> {
+                if (param === event.target.innerHTML.substring(2)) tagsToAddOrEdit.splice(index, 1);
+            });
+        }
     };
     var eventsOnEnter=()=>{
         if (event.target.className === 'tags-input')checkToEnter(event,event.target)
@@ -135,19 +155,7 @@
         var myP = document.createElement("p");
         myP.className="tags-to-add-or-edit";
         myP.innerHTML = "# " + newTag.value;
-        myP.addEventListener('click',()=>{
-            myP.style.display = 'none';
-            tagsToAddOrEdit.forEach((param,index)=> {
-                if (param === myP.innerHTML.substring(2)) tagsToAddOrEdit.splice(index, 1);
-            });
-        });
         myP.oncontextmenu=()=>{ return false;}/*Если что,тут это специально,чтобы вызывался только мой обработчик без контекстного меню.Хотя может проще можно*/
-        myP.addEventListener('contextmenu',()=>{
-            if (confirm("Добавить данный тег в список доступных?")) {
-                articlesService.addTag(event.target.innerHTML.substring(2))
-                localStorage.setItem("tags", JSON.stringify(articlesService.getTags()));
-            }
-        });
         document.getElementsByClassName("single-news")[0].insertBefore(myP, newTag.parentNode.nextElementSibling);
         newTag.value = "";
     };
@@ -273,19 +281,7 @@
             tagsToAddOrEdit.push(article.tags[i]);
             myP.className="tags-to-add-or-edit";
             myP.innerHTML = "# " + article.tags[i];
-            myP.addEventListener('click',()=>{
-                myP.style.display = 'none';
-                tagsToAddOrEdit.forEach((param,index)=> {
-                    if (param === myP.innerHTML.substring(2)) tagsToAddOrEdit.splice(index, 1);
-                });
-            });
             myP.oncontextmenu=()=>{ return false;}
-            myP.addEventListener('contextmenu',()=>{
-                if (confirm("Добавить данный тег в список доступных?")) {
-                    articlesService.addTag(event.target.innerHTML.substring(2))
-                    localStorage.setItem("tags", JSON.stringify(articlesService.getTags()));
-                }
-            });
             elem.firstElementChild.insertBefore(myP, elem.firstElementChild.getElementsByClassName("add-news-button")[0]);
         }
         newsList.insertBefore(elem, newsList.firstElementChild);
@@ -295,14 +291,7 @@
         document.getElementById("myButton").style.display = "none";
         document.getElementById("link-main-page").style.display = "";
         document.getElementById("link-add-news").style.display = "none";
-        var editNewsButton = document.getElementsByClassName("add-news-button")[0];
-        var stepForwardButton = document.getElementsByClassName("step-forward-button")[0];
-        editNewsButton.addEventListener('click', ()=> editNews(id));
-        stepForwardButton.addEventListener('click', ()=> {
-            cleanPage();
-            currentCount = 0;
-            init();
-        });
+        document.getElementsByClassName("add-news-button")[0].addEventListener('click', ()=> editNews(id));
     };
 
     /*Прочее*/
