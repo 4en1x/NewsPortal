@@ -17,9 +17,9 @@
         articlesService.toLocaleStorage();
         globalUserName=JSON.parse(localStorage.getItem("globalUserName"));
         init();
-        document.getElementsByClassName('data-content')[0].addEventListener('click', eventsInDataContent);
-        document.getElementsByClassName('data-content')[0].addEventListener('contextmenu',eventsOnContextMenu);
-        document.body.addEventListener('keydown', eventsOnEnter);
+        document.getElementsByClassName('data-content')[0].addEventListener('click', (event)=>eventsInDataContent(event));
+        document.getElementsByClassName('data-content')[0].addEventListener('contextmenu',(event)=>eventsOnContextMenu(event));
+        document.body.addEventListener('keydown', (event)=>eventsOnEnter(event));
         document.getElementsByClassName("myButton")[0].addEventListener('click',()=> filter());
         document.getElementsByClassName('search-tag')[0].addEventListener('change', (e)=> filterConfig.tags = [].slice.call(e.target.selectedOptions).map(a => a.value));
         document.getElementsByClassName("clear-filter")[0].addEventListener('click',()=> clearFilter());
@@ -38,7 +38,7 @@
         } );
     };
     document.addEventListener("DOMContentLoaded", documentReady);
-    var eventsOnContextMenu=()=>{
+    var eventsOnContextMenu=(event)=>{
         if(event.target.className === 'tags-to-add-or-edit'){
             if (confirm("Добавить данный тег в список доступных?")) {
                 articlesService.addTag(event.target.innerHTML.substring(2))
@@ -46,7 +46,7 @@
             }
         }
     };
-    var eventsInDataContent=()=>{
+    var eventsInDataContent=(event)=>{
         if (event.target.className === 'cross')clickToRemoveArticle(event.target)
         else if(event.target.className === 'tick')showWindowEditNews(event.target)
         else if (event.target.className === 'crossInOnePage')removeArticleInOnePage(event.target.parentNode.parentNode)
@@ -65,7 +65,7 @@
             });
         }
     };
-    var eventsOnEnter=()=>{
+    var eventsOnEnter=(event)=>{
         if (event.target.className === 'tags-input')checkToEnter(event,event.target)
     };
 
