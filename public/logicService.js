@@ -2,6 +2,7 @@
     "use strict";
     var currentCount = 0;
     var GLOBAL_STEP = 5;
+    var xhr = new XMLHttpRequest();
     var globalUserName;
     var filterConfig = {tags: []};
     var options = {
@@ -15,7 +16,9 @@
     /*События*/
     var documentReady=()=>{
         articlesService.toLocaleStorage();
-        globalUserName=JSON.parse(localStorage.getItem("globalUserName"));
+        xhr.open('GET', './user', false);
+        xhr.send();
+        if (xhr.status == 200) {globalUserName = xhr.responseText;};
         init();
         document.getElementsByClassName('data-content')[0].addEventListener('click', (event)=>eventsInDataContent(event));
         document.getElementsByClassName('data-content')[0].addEventListener('contextmenu',(event)=>eventsOnContextMenu(event));
@@ -25,15 +28,25 @@
         document.getElementsByClassName("clear-filter")[0].addEventListener('click',()=> clearFilter());
         document.getElementById("link-add-news").addEventListener('click',()=>showWindowAddNews() );
         document.getElementById("link-logout").addEventListener('click',()=>{
+            xhr.open("POST", '/logout', true)
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+            xhr.send();
             globalUserName=null;
-            localStorage.setItem("globalUserName", JSON.stringify(globalUserName));
             location.reload();
         } );
         document.getElementById("login-submit").addEventListener('click',()=>{
-            if(document.getElementById("login-name").value==="admin"&&document.getElementById("login-password").value==="admin") {
-                globalUserName = "admin";
-                localStorage.setItem("globalUserName", JSON.stringify(globalUserName));
+            var body = 'name=' + encodeURIComponent(document.getElementById("login-name").value) + '&password=' + encodeURIComponent(document.getElementById("login-password").value);
+            xhr.open("POST", '/login', true)
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+            xhr.send(body);
+            xhr.open('GET', './user', false);
+            xhr.send();
+            if (xhr.status == 200) {
+                globalUserName = xhr.responseText;
                 location.reload();
+            }
+            else {
+                alert(xhr.responseText);
             }
         } );
     };
@@ -42,7 +55,7 @@
         if(event.target.className === 'tags-to-add-or-edit'){
             if (confirm("Добавить данный тег в список доступных?")) {
                 articlesService.addTag(event.target.innerHTML.substring(2))
-                localStorage.setItem("tags", JSON.stringify(articlesService.getTags()));
+                articlesService.toLocaleStorage();
             }
         }
     };
@@ -227,6 +240,7 @@
     var removeArticleInOnePage=(crossButton)=> {
         if (confirm("Вы точно хотите удалить эту новость?")) {
             articlesService.removeArticle(crossButton.id);
+            articlesService.toLocaleStorage();
             crossButton.parentNode.removeChild(crossButton.parentNode.firstElementChild);
             crossButton.parentNode.removeChild(crossButton.parentNode.firstElementChild);
             currentCount = 0;
@@ -302,7 +316,6 @@
     var setUserName=()=> {
         if (globalUserName) document.getElementsByClassName("username")[0].innerHTML = "<p>Log as " + globalUserName + "</p>";
         else document.getElementsByClassName("username")[0].innerHTML = "";
-        localStorage.setItem("globalUserName", JSON.stringify(globalUserName));
     };
     var checkToEnter=(event, elem)=> {if(event.keyCode === 13) addOneMoreTagToList(elem)};
 }();
