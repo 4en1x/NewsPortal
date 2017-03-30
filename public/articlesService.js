@@ -1,34 +1,40 @@
 var articlesService = (function () {
     "use strict";
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', './articles', false);
-    xhr.send();
-    if (xhr.status != 200) {
-        alert('Ошибка ' + xhr.status + ': ' + xhr.statusText);
-    } else {
-        var articles = (JSON.parse(xhr.responseText, (key, value) => {
-            if (key == 'createdAt') return new Date(value);
-            return value;
-        }));
-    }
-
-    xhr.open('GET', './tags', false);
-    xhr.send();
-    if (xhr.status != 200) {
-        alert('Ошибка ' + xhr.status + ': ' + xhr.statusText);
-    } else {
-        var tags = (JSON.parse(xhr.responseText));
-    }
-
-    xhr.open('GET', './images', false);
-    xhr.send();
-    if (xhr.status != 200) {
-        alert('Ошибка ' + xhr.status + ': ' + xhr.statusText);
-    } else {
-        var images = (JSON.parse(xhr.responseText));
-    }
-
-
+    var articles,images,tags;
+    var getArticlesFromDB=()=>{
+        xhr.open('GET', './articles', false);
+        xhr.send();
+        if (xhr.status != 200) {
+            alert('Ошибка ' + xhr.status + ': ' + xhr.statusText);
+        } else {
+            articles = (JSON.parse(xhr.responseText, (key, value) => {
+                if (key == 'createdAt') return new Date(value);
+                return value;
+            }));
+        }
+    };
+    var getTagsFromDB=()=> {
+        xhr.open('GET', './tags', false);
+        xhr.send();
+        if (xhr.status != 200) {
+            alert('Ошибка ' + xhr.status + ': ' + xhr.statusText);
+        } else {
+            tags = (JSON.parse(xhr.responseText));
+        }
+    };
+    var getImagesFromDB=()=> {
+        xhr.open('GET', './images', false);
+        xhr.send();
+        if (xhr.status != 200) {
+            alert('Ошибка ' + xhr.status + ': ' + xhr.statusText);
+        } else {
+            images = (JSON.parse(xhr.responseText));
+        }
+    };
+    getArticlesFromDB();
+    getTagsFromDB();
+    getImagesFromDB();
 
     var getArticles=(skip=0, top=10, filterConfig={})=> {
         var _author = filterConfig.author || "";
