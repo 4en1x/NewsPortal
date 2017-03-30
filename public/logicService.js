@@ -65,7 +65,7 @@
         else if (event.target.className === 'crossInOnePage')removeArticleInOnePage(event.target.parentNode.parentNode)
         else if(event.target.className === 'tickInOnePage')editArticleInOnePage(event.target)
         else if(event.target.className === 'show-one-news')showOneNews(event.target.parentNode.id)
-        else if(event.target.className === 'load-more-button')init()
+        else if(event.target.className === 'load-more-button')init();
         else if(event.target.className === 'step-forward-button'){
             cleanPage();
             currentCount = 0;

@@ -1,25 +1,34 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
-    fs = require('fs'),
+    db = require('diskdb'),
     app = express();
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 let articles,tags,images,users,user=null;
+db.connect(__dirname +'/public/JSON', ['articles','tags','users','images']);
+users=db.users.find();
 
-fs.readFile(__dirname +'/public/JSON/articles.json', 'utf8', (err, data)=> {articles=data});
-fs.readFile(__dirname +'/public/JSON/tags.json', 'utf8', (err, data)=> {tags=data});
-fs.readFile(__dirname +'/public/JSON/images.json', 'utf8', (err, data)=> {images=data});
-fs.readFile(__dirname +'/public/JSON/users.json', 'utf8', (err, data)=> {users=JSON.parse(data)});
+app.get('/articles', (req, res) =>{res.send(db.articles.find());});
+app.post('/articles', (req, res)=>{
+    db.articles.remove();
+    db.loadCollections(['articles']);
+    db.articles.save(req.body);
+});
 
-app.get('/articles', (req, res) =>{res.send(articles);});
-app.post('/articles', (req, res)=>{articles=req.body;});
+app.get('/tags', (req, res) =>{res.send(db.tags.find());});
+app.post('/tags', (req, res)=>{
+    db.tags.remove();
+    db.loadCollections(['tags']);
+    db.tags.save(req.body);
+});
 
-app.get('/tags', (req, res) =>{res.send(tags);});
-app.post('/tags', (req, res)=>{tags=req.body;});
-
-app.get('/images', (req, res) =>{res.send(images);});
-app.post('/images', (req, res)=>{images=req.body;});
+app.get('/images', (req, res) =>{res.send(db.images.find());});
+app.post('/images', (req, res)=>{
+    db.images.remove();
+    db.loadCollections(['images']);
+    db.images.save(req.body);
+});
 
 app.post('/login', (req, res) =>{
     var customUser;
