@@ -35,10 +35,11 @@
             location.reload();
         } );
         document.getElementById("login-submit").addEventListener('click',()=>{
-            var body = 'name=' + encodeURIComponent(document.getElementById("login-name").value) + '&password=' + encodeURIComponent(document.getElementById("login-password").value);
+            var body = {name:(document.getElementById("login-name").value),password:document.getElementById("login-password").value};
             xhr.open("POST", '/login', true)
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-            xhr.send(body);
+            xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+            xhr.send(JSON.stringify(body));
+
             xhr.open('GET', './user', false);
             xhr.send();
             if (xhr.status == 200) {

@@ -12,7 +12,6 @@ var articlesService = (function () {
         }));
     }
 
-
     xhr.open('GET', './tags', false);
     xhr.send();
     if (xhr.status != 200) {
