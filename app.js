@@ -14,6 +14,7 @@ app.post('/articles', (req, res)=>{
     db.articles.remove();
     db.loadCollections(['articles']);
     db.articles.save(req.body);
+    res.end();
 });
 
 app.get('/tags', (req, res) =>{res.send(db.tags.find());});
@@ -21,6 +22,7 @@ app.post('/tags', (req, res)=>{
     db.tags.remove();
     db.loadCollections(['tags']);
     db.tags.save(req.body);
+    res.end();
 });
 
 app.get('/images', (req, res) =>{res.send(db.images.find());});
@@ -28,15 +30,17 @@ app.post('/images', (req, res)=>{
     db.images.remove();
     db.loadCollections(['images']);
     db.images.save(req.body);
+    res.end();
 });
 
 app.post('/login', (req, res) =>{
     var customUser;
     if(customUser=users.find(param=>param.firstName===req.body.name &&param.lastName===req.body.password))
         user=customUser.firstName;
+    res.end();
 });
 
-app.post('/logout', (req, res) =>{user=null;});
+app.post('/logout', (req, res) =>{user=null;res.end();});
 
 app.get('/user', (req, res)=>{
     if(user===null)
