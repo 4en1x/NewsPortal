@@ -4,8 +4,12 @@
     <link rel="stylesheet" href="index.css">
     <meta charset="UTF-8">
     <title>Document</title>
+    <script src="autorization.js"></script>
     <script src="articlesService.js"></script>
     <script src="logicService.js"></script>
+    <script src="helpers.js"></script>
+    <script src="models.js"></script>
+
 </head>
 <body>
     <div class="main-header">
@@ -13,7 +17,7 @@
         <div class='search-link'>
             <a id="link-search" href="">Search</a>
             <div class="search-panel">
-                <a class="clear-filter">Очистить фильтр</a>
+                <a class="clear-filter" data-action="clearFilter">Очистить фильтр</a>
                 <p>Имя автора:</p>
                 <div class="search" id="author-search">
                     <input type="search" placeholder="Поиск по автору" class="input" />
@@ -27,14 +31,14 @@
                 <p>Теги:</p>
                 <select multiple class="search-tag"></select>
 
-                <a href="#" class="myButton" id="myButton">Поиск!</a>
+                <a href="#" class="myButton" id="myButton" data-action="filter">Поиск!</a>
             </div>
         </div>
         <div class="main-header-links">
             <label for="modal" id="link-login" >Login</label>
-            <a id="link-logout" class="link-logout">Logout</a>
-            <a id="link-add-news" class="link-add-news">Add news</a>
-            <a id="link-main-page" class="link-main-page">Main page</a>
+            <a id="link-logout" data-action="logout" class="link-logout">Logout</a>
+            <a href="#modal-add-news" id="link-add-news" class="link-add-news">Add news</a>
+            <label id="link-main-page" class="link-main-page" data-action="mainPage">Main page</label>
         </div>
         <div class="username"></div>
         <h1>My Super News Portal</h1>
@@ -55,26 +59,59 @@
                         <input id="login-password" type="password" placeholder="Password" />
                     </div>
                     <div class="submit">
-                        <button id="login-submit" class="login-submit">Войти</button>
+                        <button id="login-submit" data-action="login" class="login-submit">Войти</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="data-content">
-        <div class="load-more"><a class="load-more-button">Load more</a></div>
+
+
+    <a  class="overlay" id="modal-add-news"></a>
+    <div class="popup">
+        <div class="single-news" id ='add-single-news'>
+            <h1>Добавить новость</h1>
+            <p><textarea id="add-title-textarea" rows="4" cols="100" name="text" placeholder="Некое заглавие новости"></textarea></p>
+            <p><textarea id="add-summary-textarea" rows="10" cols="100" name="text" placeholder="Краткий текст новости"></textarea></p>
+            <p><textarea id="add-content-textarea" rows="10" cols="100" name="text" placeholder="Полный текст новости"></textarea></p>
+            <p><textarea id="add-url-textarea" rows="4" cols="100" name="text" placeholder="url картинки"></textarea></p>
+            <p><input type="text" size="99" placeholder="Поле для ввода тегов(по нажатию на enter)" class="tags-input" data-action="addTagInAdd"></p>
+            <button data-action="addNews" class="add-news-button" id ="add-news-button">Добавить новость</button>
+        </div>
+        <a class="close" title="Закрыть" href="#"></a>
+    </div>
+    <a  class="overlay" id="modal-edit-news"></a>
+    <div class="popup">
+        <div class="single-news" id ='edit-single-news'>
+            <h1>Изменить новость</h1>
+            <p><textarea id="change-title-textarea" rows="4" cols="100" name="text" placeholder="Некое заглавие новости"></textarea></p>
+            <p><textarea id="change-summary-textarea" rows="10" cols="100" name="text" placeholder="Краткий текст новости"></textarea></p>
+            <p><textarea id="change-content-textarea" rows="10" cols="100" name="text" placeholder="Полный текст новости"></textarea></p>
+            <p><textarea id="change-url-textarea" rows="4" cols="100" name="text" placeholder="url картинки"></textarea></p>
+            <p><input type="text" size="99" placeholder="Поле для ввода тегов(по нажатию на enter)" class="tags-input" data-action="addTagInEdit" ></p>
+            <button class="add-news-button" id ="edit-news-button" data-action="editNews">Изменить новость</button>
+        </div>
+        <a class="close" title="Закрыть" href="#"></a>
+    </div>
+
+
+    <div class="data-content" id="data-content">
+
+    </div>
+    <div class="load-more" id="load-more">
+        <a class="load-more-button" data-action="loadMore">Load more</a>
     </div>
     <template id="single-news-template">
         <div class="single-news">
             <div class="image-header"><img src="" alt=""></div>
             <h1></h1>
             <p></p>
-            <a class="show-one-news">Раскрыть новость...</a>
+            <a class="show-one-news" data-action="showNews">Раскрыть новость...</a>
             <span class="author"></span>
             <time class="post-date"></time>
             <span class="redact-buttons">
-                <a class="tick"></a>
-                <a class="cross"></a>
+                <a href="#modal-edit-news"  data-action="showEditNews" class="tick"></a>
+                <a data-action="removeNews" class="cross"></a>
             </span>
         </div>
     </template>
@@ -84,34 +121,13 @@
             <span class="author"></span>
             <time class="post-date"></time>
             <span class="redact-buttons">
-                <a class="tickInOnePage"></a>
-                <a class="crossInOnePage"></a>
+                <a href="#modal-edit-news" class="tickInOnePage" data-action="showEditNews"></a>
+                <a class="crossInOnePage" data-action="removeNewsInOnePage"></a>
             </span>
         </div>
     </template>
-    <template id="add-news-template">
-        <div class="single-news">
-            <h1>Добавить новость</h1>
-            <p><textarea id="add-title-textarea" rows="4" cols="100" name="text" placeholder="Некое заглавие новости"></textarea></p>
-            <p><textarea id="add-summary-textarea" rows="10" cols="100" name="text" placeholder="Краткий текст новости"></textarea></p>
-            <p><textarea id="add-content-textarea" rows="10" cols="100" name="text" placeholder="Полный текст новости"></textarea></p>
-            <p><textarea id="add-url-textarea" rows="4" cols="100" name="text" placeholder="url картинки"></textarea></p>
-            <p><input type="text" size="99" placeholder="Поле для ввода тегов(по нажатию на enter)" class="tags-input" ></p>
-            <button class="add-news-button">Добавить новость</button>
-        </div>
-    </template>
-    <template id="change-news-template">
-        <div class="single-news">
-            <h1>Изменить новость</h1>
-            <p><textarea id="change-title-textarea" rows="4" cols="100" name="text" placeholder="Некое заглавие новости"></textarea></p>
-            <p><textarea id="change-summary-textarea" rows="10" cols="100" name="text" placeholder="Краткий текст новости"></textarea></p>
-            <p><textarea id="change-content-textarea" rows="10" cols="100" name="text" placeholder="Полный текст новости"></textarea></p>
-            <p><textarea id="change-url-textarea" rows="4" cols="100" name="text" placeholder="url картинки"></textarea></p>
-            <p><input type="text" size="99" placeholder="Поле для ввода тегов(по нажатию на enter)" class="tags-input" ></p>
-            <button class="add-news-button">Изменить новость</button>
-            <button class="step-forward-button">Вернуться обратно</button>
-        </div>
-    </template>
+
+
     <div class="page-footer">
         <p><i>Super News Portal | Стефанович Константин | 2 курс , 6 группа | Contact : <a href="mailto:freeplayercot@gmail.com">freeplayercot@gmail.com</a> | 17.02.2017</i></p>
     </div>
