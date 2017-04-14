@@ -1,136 +1,159 @@
 const articlesService = (function () {
-  const xhr = new XMLHttpRequest();
   let articles;
   let images;
-  let tags;
-  const getArticlesFromDB = () => {
-    xhr.open('GET', './articles', false);
-    xhr.send();
-    if (xhr.status !== 200) {
-      alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
-    } else {
-      articles = (JSON.parse(xhr.responseText, (key, value) => {
-        if (key === 'createdAt') return new Date(value);
-        return value;
-      }));
-    }
-  };
-  const getTagsFromDB = () => {
-    xhr.open('GET', './tags', false);
-    xhr.send();
-    if (xhr.status !== 200) {
-      alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
-    } else {
-      tags = (JSON.parse(xhr.responseText));
-    }
-  };
-  const getImagesFromDB = () => {
-    xhr.open('GET', './images', false);
-    xhr.send();
-    if (xhr.status !== 200) {
-      alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
-    } else {
-      images = (JSON.parse(xhr.responseText));
-    }
-  };
-  getArticlesFromDB();
-  getTagsFromDB();
-  getImagesFromDB();
+  let tagsIndex;
+  let orderIndex;
+  let currentMaxSize;
+  const MIN_DATE = new Date(-8640000000000000);
+  const MAX_DATE = new Date(8640000000000000);
+  httpGet('./articles')
+         .then(
+             (response) => {
+               articles = (JSON.parse(response, (key, value) => {
+                 if (key === 'createdAt') return new Date(value);
+                 return value;
+               }));
+             },
+             error => alert(`Rejected: ${error}`)
+         );
+  httpGet('./tags')
+         .then(
+            response => tagsIndex = (JSON.parse(response)),
+            error => alert(`Rejected: ${error}`)
+        );
+  httpGet('./images')
+         .then(
+            response => images = (JSON.parse(response)),
+            error => alert(`Rejected: ${error}`)
+        );
+  httpGet('./order')
+         .then(
+            // read https://github.com/arvindr21/diskDB/issues/32
+            // пока нет нормальной базы данных, приходится делать так
+            response => orderIndex = (JSON.parse(response)).reverse(),
+            error => alert(`Rejected: ${error}`)
+        );
 
-  const getArticles = (skip = 0, top = 10, filterConfig = {}) => {
-    const author = filterConfig.author || '';
-    const beginDate = filterConfig.beginDate || new Date(-8640000000000000);
-    const endDate = filterConfig.endDate || new Date(8640000000000000);
-    const filterTags = filterConfig.tags;
-    let clone = articles;
-    clone = clone.filter(param => param.author.indexOf(author) > -1);
-    clone = clone.filter(param => param.createdAt >= beginDate && param.createdAt <= endDate);
-    if (filterTags) {
-      clone = clone.filter((param) => {
-        for (let i = 0; i < filterTags.length; i += 1) {
-          if (param.tags.indexOf(filterTags[i]) === -1) return false;
-        }
-        return true;
-      });
-    }
-    return clone.sort((a, b) => b.createdAt - a.createdAt).slice(skip, skip + top);
-  };
-  const getArticle = id => articles.find(param => param.id === id);
-  const inTags = tag => tags.find(param => param === tag);
-  const getImage = id => images.find(param => param.id === id);
-  const addNewImage = (id, url) => images.push({ id, url });
-  const validateArticle = (article, withoutID) => {
-    if (typeof article.title !== 'string' || article.title.length <= 0 || article.title.length > 100) return false;
-    if (typeof article.summary !== 'string' || article.summary.length <= 0 || article.summary.length > 200) return false;
-    if (withoutID === undefined && (typeof article.id !== 'string' || article.id.length <= 0 || getArticle(article.id) !== undefined)) return false;
-    if ((article.createdAt instanceof Date) === false) return false;
-    if (typeof article.author !== 'string' || article.author.length <= 0) return false;
-    if (typeof article.content !== 'string' || article.content.length <= 0) return false;
-    if (article.tags.length <= 0) return false;
-    for (let i = 0; i < article.tags.length; i += 1) {
-      if (tags.indexOf(article.tags[i]) === -1) return false;
-    }
+  function findArticles(skip = 0, top = 0, properties = {}) {
+    const author = properties.author || '';
+    const beginDate = properties.beginDate || MIN_DATE;
+    const endDate = properties.endDate || MAX_DATE;
+    let ids = filterTags(properties.tags) || orderIndex;
+    ids = ids.filter(id => articles[id].author.indexOf(author) > -1);
+    ids = ids.filter(id => {
+      return articles[id].createdAt >= beginDate && articles[id].createdAt <= endDate;
+    });
+    currentMaxSize = ids.length;
+    return ids.map(id => articles[id])
+            .slice(skip, skip + top);
+  }
+  function filterTags(tags) {
+    if (!tags) return;
+    let intersection = new Set(orderIndex);
+    tags.forEach((tag) => {
+      const commonArticles = new Set(tagsIndex[tag]);
+      intersection = [...intersection].filter(x => commonArticles.has(x));
+    });
+    return [...intersection];
+  }
+  const getImage = id => images[id];
+  function changeImage(id, url) {
+    images[id] = url;
+  }
+  function removeArticle(id) {
+    articles[id] = null;
+    delete articles[id];
+    removeArticleId(id, orderIndex);
+    deleteFromTagIndex(id);
     return true;
-  };
-  const addArticle = (article) => {
-    if (validateArticle(article)) { articles.push(article); return true; }
-    return false;
-  };
-  const removeArticle = (id) => {
-    const x = articles.findIndex(param => param.id === id);
-    if (x === undefined) return false;
-    articles.splice(x, 1);
-    return true;
-  };
-  const editArticle = (id, config) => {
-    const clone = getArticle(id);
-    if (!clone) return false;
-    const article = Object.assign({}, clone);
-    if (config.title) article.title = config.title;
-    if (config.summary) article.summary = config.summary;
-    if (config.content) article.content = config.content;
-    if (config.tags) article.tags = config.tags;
-    if (validateArticle(article, '')) {
-      removeArticle(id);
-      addArticle(article);
+  }
+  function removeArticleId(id, articleIds) {
+    const index = articleIds.indexOf(id);
+    if (index !== -1) articleIds.splice(index, 1);
+  }
+  function createArticle(article) {
+    if (validateArticle(article)) {
+      const id = article.id;
+      orderIndex.unshift(id);
+      articles[id] = article;
+      addToTagIndex(article, id);
       return true;
     }
     return false;
+  }
+  function addToTagIndex(article, id) {
+    article.tags.forEach((tag) => {
+      if (!tagsIndex[tag]) {
+        tagsIndex[tag] = [id];
+      } else if (tagsIndex[tag].indexOf(id) === -1) {
+        tagsIndex[tag].unshift(id);
+      }
+    });
+  }
+  function deleteFromTagIndex(id) {
+    for (const key in tagsIndex) {
+      removeArticleId(id, tagsIndex[key]);
+      if (tagsIndex[key].length === 0) { delete tagsIndex[key]; }
+    }
+  }
+  function addNewImage(id, url) {
+    images[id] = url;
+    return true;
+  }
+  function readArticle(id) {
+    if (!id) {
+      throw new Error('please provide id');
+    }
+    return articles[id];
+  }
+  const validateArticle = (article, withoutID) => {
+    if (article.title.length <= 0 || article.title.length > 100) return false;
+    if (article.summary.length <= 0 || article.summary.length > 200) return false;
+    if (!withoutID && (article.id.length <= 0 || readArticle(article.id))) return false;
+    if ((article.createdAt instanceof Date) === false) return false;
+    if (article.author.length <= 0) return false;
+    if (article.content.length <= 0) return false;
+    if (article.tags.length <= 0) return false;
+    return true;
   };
-  const addTag = (tag) => {
-    if (inTags(tag) === undefined) { tags.push(tag); return true; }
+  function editArticle(article) {
+    if (validateArticle(article, 1)) {
+      const id = article.id;
+      removeArticleId(id, orderIndex);
+      orderIndex.unshift(id);
+      articles[id] = article;
+      deleteFromTagIndex(id);
+      addToTagIndex(article, id);
+      return true;
+    }
     return false;
-  };
-  const deleteTag = (tag) => {
-    const x = inTags(tag);
-    if (inTags(tag) !== undefined) { tags.splice(x, 1); return true; }
-    return false;
-  };
-  const getTags = () => tags;
+  }
   const toLocaleStorage = () => {
-    xhr.open('POST', '/articles', true);
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-    xhr.send(JSON.stringify(articles));
-    xhr.open('POST', '/tags', true);
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-    xhr.send(JSON.stringify(tags));
-    xhr.open('POST', '/images', true);
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-    xhr.send(JSON.stringify(images));
+    httpPost('/articles', articles)
+            .then(error => alert(`Rejected: ${error}`));
+    httpPost('/order', orderIndex)
+            .then(error => alert(`Rejected: ${error}`));
+    httpPost('/tags', tagsIndex)
+            .then(error => alert(`Rejected: ${error}`));
+    httpPost('/images', images)
+            .then(error => alert(`Rejected: ${error}`));
   };
+  const getSize = () => currentMaxSize;
+  function getTags() {
+    return tagsIndex;
+  }
   return {
-    getArticles,
-    getArticle,
-    validateArticle,
-    addArticle,
-    editArticle,
-    inTags,
-    addTag,
-    deleteTag,
-    removeArticle,
+    findArticles,
     getImage,
+    removeArticle,
+    createArticle,
     addNewImage,
-    getTags,
+    readArticle,
+    editArticle,
     toLocaleStorage,
+    changeImage,
+    getSize,
+    getTags,
+
   };
 }());
