@@ -1,9 +1,4 @@
-(function () {
-  let currentCount = 0;
-  const GLOBAL_STEP = 2;
-  let globalUserName;
-  let filterConfig = { tags: [] };
-  let tagsToAddOrEdit = [];
+const logicService =(function () {
   const actions = {
     addNews: (event) => {
       addNews();
@@ -34,10 +29,10 @@
       editNews(heyTarget(event));
     },
     logout: (event) => {
-      globalUserName = logoutClick(globalUserName);
+      logoutClick();
     },
     login: (event) => {
-      globalUserName = loginSubmitClick(globalUserName);
+      loginSubmitClick();
     },
     searchTag: (event) => {
       searchTag(heyTarget(event));
@@ -60,8 +55,7 @@
 
 
   const documentReady = () => {
-    globalUserName = checkLogin(globalUserName);
-    init();
+    checkLogin(globalUserName);
     document.body.addEventListener('click', (event) => {
       const actionKey = heyTarget(event).getAttribute('data-action');
       const action = actions[actionKey];
@@ -96,16 +90,15 @@
     tagsOptions.size = customTags.length;
   }
   function init() {
-    setUserName(globalUserName);
     const news = heyId('single-news-template');
     const mas = articlesService.findArticles(currentCount, GLOBAL_STEP, filterConfig);
     mas.forEach((item) => {
       let singleNews = news.content.cloneNode(true);
-      singleNews = articlesModels.constructNews(singleNews, item, globalUserName);
+      singleNews = articlesModels.constructNews(singleNews, item);
       heyId('data-content').appendChild(singleNews);
     });
     currentCount += mas.length;
-    optionForMainPage(globalUserName, currentCount);
+    optionForMainPage(currentCount);
     tagsMenu();
   }
   const removeArticle = (article) => {
@@ -218,4 +211,8 @@
     [].forEach.call(InputSearchElements, elem => elem.value = '');
     filterConfig = { tags: [] };
   };
+  return{
+    init,
+
+  }
 }());

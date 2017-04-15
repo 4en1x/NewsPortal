@@ -5,7 +5,7 @@ const articlesModels = (function () {
     day: 'numeric',
     timezone: 'UTC',
   };
-  function constructNews(singleNews, article, globalUserName) {
+  function constructNews(singleNews, article) {
     const newsContent = singleNews.firstElementChild;
     newsContent.dataset.id = article.id;
     const singleNewsImage = heyClass(newsContent, 'image-header').firstElementChild;

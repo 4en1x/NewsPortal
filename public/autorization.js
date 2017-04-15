@@ -1,35 +1,36 @@
-const xhr = new XMLHttpRequest();
-const logoutClick = (globalUserName) => {
-  xhr.open('POST', '/logout', true);
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhr.send();
-  globalUserName = null;
-  document.location.href = '/';
-  return globalUserName;
+const logoutClick = () => {
+    httpPost('/logout')
+        .then(error => alert(`Rejected: ${error}`));
+    checkLogin();
+    globalUserName = null;
+    document.location.href = '/';
 };
-const loginSubmitClick = (globalUserName) => {
+const loginSubmitClick = () => {
   const body = {
     name: heyId('login-name').value,
     password: heyId('login-password').value,
   };
-  xhr.open('POST', '/login', true);
-  xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-  xhr.send(JSON.stringify(body));
-  xhr.open('GET', './user', false);
-  xhr.send();
-  if (xhr.status === 200) {
-    globalUserName = xhr.responseText;
-    document.location.href = '/';
-  } else {
-    alert(xhr.responseText);
-  }
-  return globalUserName;
+  httpPost('/login', body)
+      .then(error => alert(`Rejected: ${error}`));
+  checkLogin();
+  heyId('link-login').click();
 };
-const checkLogin = (globalUserName) => {
-  xhr.open('GET', './user', false);
-  xhr.send();
-  if (xhr.status === 200) globalUserName = xhr.responseText;
-  return globalUserName;
+const checkLogin = () => {
+    httpGet('./user')
+        .then(
+            response => {
+                globalUserName = response;
+                setUserName();
+                currentCount = 0;
+                cleanPage();
+                logicService.init();
+            },
+            error=> {
+                currentCount = 0;
+                cleanPage();
+                logicService.init()
+            }
+        );
 };
 function httpPost(url, who) {
   return new Promise((resolve, reject) => {

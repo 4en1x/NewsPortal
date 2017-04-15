@@ -1,3 +1,9 @@
+let currentCount = 0;
+const GLOBAL_STEP = 2;
+let globalUserName;
+let filterConfig = { tags: [] };
+let tagsToAddOrEdit = [];
+
 function heyId(id) {
   return document.getElementById(id);
 }
@@ -22,14 +28,14 @@ const cleanPage = () => {
     heyId('data-content').removeChild(heyId('data-content').firstElementChild);
   }
 };
-const setUserName = (globalUserName) => {
+const setUserName = () => {
   if (globalUserName) {
     heyClass(document, 'username').innerHTML = `<p>Log as ${globalUserName}</p>`;
   } else {
     heyClass(document, 'username').innerHTML = '';
   }
 };
-const optionForMainPage = (globalUserName, currentCount) => {
+const optionForMainPage = (currentCount) => {
   toggle({ myButton: true, 'link-main-page': false });
   const status = Boolean(globalUserName);
   toggle({ 'link-login': !status, 'link-logout': status, 'link-add-news': status });
