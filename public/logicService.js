@@ -1,4 +1,4 @@
-const logicService =(function () {
+const logicService = (function () {
   const actions = {
     addNews: (event) => {
       addNews();
@@ -53,7 +53,6 @@ const logicService =(function () {
     },
   };
 
-
   const documentReady = () => {
     checkLogin(globalUserName);
     document.body.addEventListener('click', (event) => {
@@ -67,6 +66,7 @@ const logicService =(function () {
       if (action) action(event);
     });
     heyClass(document, 'search-tag').addEventListener('change', e => eventsOnChange(e));
+
   };
   document.addEventListener('DOMContentLoaded', documentReady);
 
@@ -211,7 +211,7 @@ const logicService =(function () {
     [].forEach.call(InputSearchElements, elem => elem.value = '');
     filterConfig = { tags: [] };
   };
-  return{
+  return {
     init,
 
   }

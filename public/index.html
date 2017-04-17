@@ -24,9 +24,9 @@
                 </div>
                 <p>Дата:</p>
                 <div class="search" id="date-search">
-                    <input type="search" placeholder="Дата начала mm/dd/yyyy" class="input" />
+                    <input type="date" placeholder="Дата начала mm/dd/yyyy" class="input" />
                     <p></p>
-                    <input type="search" placeholder="Дата конца mm/dd/yyyy" class="input" />
+                    <input type="date" placeholder="Дата конца mm/dd/yyyy" class="input" />
                 </div>
                 <p>Теги:</p>
                 <select multiple class="search-tag"></select>
@@ -68,9 +68,9 @@
 
 
     <a  class="overlay" id="modal-add-news"></a>
-    <div class="popup">
+    <div class="popup" data-action="scroll">
         <div class="single-news" id ='add-single-news'>
-            <h1>Добавить новость</h1>
+            <h1 class="namePopup">Добавить новость</h1>
             <p><textarea id="add-title-textarea" rows="4" cols="100" name="text" placeholder="Некое заглавие новости"></textarea></p>
             <p><textarea id="add-summary-textarea" rows="10" cols="100" name="text" placeholder="Краткий текст новости"></textarea></p>
             <p><textarea id="add-content-textarea" rows="10" cols="100" name="text" placeholder="Полный текст новости"></textarea></p>
@@ -81,9 +81,9 @@
         <a class="close" title="Закрыть" href="#"></a>
     </div>
     <a  class="overlay" id="modal-edit-news"></a>
-    <div class="popup">
+    <div class="popup" data-action="scroll">
         <div class="single-news" id ='edit-single-news'>
-            <h1>Изменить новость</h1>
+            <h1 class="namePopup">Изменить новость</h1>
             <p><textarea id="change-title-textarea" rows="4" cols="100" name="text" placeholder="Некое заглавие новости"></textarea></p>
             <p><textarea id="change-summary-textarea" rows="10" cols="100" name="text" placeholder="Краткий текст новости"></textarea></p>
             <p><textarea id="change-content-textarea" rows="10" cols="100" name="text" placeholder="Полный текст новости"></textarea></p>
