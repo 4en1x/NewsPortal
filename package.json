@@ -12,6 +12,10 @@
   "bugs": {
     "url": "https://github.com/4en1x/NewsPortal/issues"
   },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
   "homepage": "https://github.com/4en1x/NewsPortal#readme",
   "dependencies": {
     "body-parser": "^1.17.1",
