@@ -11,8 +11,9 @@ const loginSubmitClick = () => {
     password: heyId('login-password').value,
   };
   httpPost('/login', body)
-      .then(error => alert(`Rejected: ${error}`));
-  checkLogin();
+      .then(error => alert(`Rejected: ${error}`),
+          checkLogin()
+      );
   heyId('link-login').click();
 };
 const checkLogin = () => {
