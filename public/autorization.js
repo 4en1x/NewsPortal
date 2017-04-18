@@ -12,9 +12,8 @@ const loginSubmitClick = () => {
   };
   httpPost('/login', body)
       .then(error => alert(`Rejected: ${error}`),
-
-              checkLogin(),
-              heyId('link-login').click(),
+          checkLogin(),
+          heyId('link-login').click()
       );
 };
 const checkLogin = () => {
