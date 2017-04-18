@@ -1,9 +1,13 @@
 const logoutClick = () => {
     httpPost('/logout')
-        .then(error => alert(`Rejected: ${error}`));
-    checkLogin();
-    globalUserName = null;
-    document.location.href = '/';
+        .then(
+            response=>{
+                checkLogin();
+                globalUserName = null;
+                document.location.href = '/';
+            },
+            error => alert(`Rejected: ${error}`)
+        );
 };
 const loginSubmitClick = () => {
   const body = {
@@ -11,9 +15,12 @@ const loginSubmitClick = () => {
     password: heyId('login-password').value,
   };
   httpPost('/login', body)
-      .then(error => alert(`Rejected: ${error}`),
-          checkLogin(),
-          heyId('link-login').click()
+      .then(
+          response=> {
+              checkLogin();
+              heyId('link-login').click();
+          }, 
+          error => alert(`Rejected: ${error}`)
       );
 };
 const checkLogin = () => {
@@ -40,6 +47,15 @@ function httpPost(url, who) {
     xhr.onerror = function () {
       reject(new Error('Network Error'));
     };
+    xhr.onreadystatechange = function () {
+        if (this.status === 200) {
+            resolve(this.response);
+        } else {
+            const error = new Error(this.statusText);
+            error.code = this.status;
+            reject(error);
+        }
+      };
     xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
     xhr.send(JSON.stringify(who));
   });

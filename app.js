@@ -53,10 +53,10 @@ app.post('/images', (req, res) => {
 app.post('/login', (req, res) => {
   const customUser = users.find(param => param.firstName === req.body.name && param.lastName === req.body.password);
   if (customUser) { user = customUser.firstName; }
-  res.end();
+  res.status(200).end();
 });
 
-app.post('/logout', (req, res) => { user = null; res.end(); });
+app.post('/logout', (req, res) => { user = null; res.status(200).end(); });
 
 app.get('/user', (req, res) => {
   if (user === null) { res.status(400).send('Current password does not match'); } else {
