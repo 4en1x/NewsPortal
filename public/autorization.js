@@ -19,7 +19,7 @@ const loginSubmitClick = () => {
           response=> {
               checkLogin();
               heyId('link-login').click();
-          }, 
+          },
           error => alert(`Rejected: ${error}`)
       );
 };

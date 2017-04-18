@@ -130,13 +130,25 @@ const articlesService = (function () {
   }
   const toLocaleStorage = () => {
     httpPost('/articles', articles)
-            .then(error => alert(`Rejected: ${error}`));
+        .then(
+            response=>{},
+            error => alert(`Rejected: ${error}`)
+        );
     httpPost('/order', orderIndex)
-            .then(error => alert(`Rejected: ${error}`));
+        .then(
+            response=>{},
+            error => alert(`Rejected: ${error}`)
+        );
     httpPost('/tags', tagsIndex)
-            .then(error => alert(`Rejected: ${error}`));
+        .then(
+            response=>{},
+            error => alert(`Rejected: ${error}`)
+        );
     httpPost('/images', images)
-            .then(error => alert(`Rejected: ${error}`));
+        .then(
+            response=>{},
+            error => alert(`Rejected: ${error}`)
+        );
   };
   const getSize = () => currentMaxSize;
   function getTags() {
