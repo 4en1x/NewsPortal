@@ -12,9 +12,10 @@ const loginSubmitClick = () => {
   };
   httpPost('/login', body)
       .then(error => alert(`Rejected: ${error}`),
-          checkLogin()
+
+              checkLogin(),
+              heyId('link-login').click(),
       );
-  heyId('link-login').click();
 };
 const checkLogin = () => {
     httpGet('./user')
