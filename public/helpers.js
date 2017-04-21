@@ -39,12 +39,17 @@ const optionForMainPage = (currentCount) => {
   toggle({ myButton: true, 'link-main-page': false });
   const status = Boolean(globalUserName);
   toggle({ 'link-login': !status, 'link-logout': status, 'link-add-news': status });
-  if (currentCount === articlesService.getSize()) {
-    heyId('load-more').innerHTML = '';
-  } else {
-    heyId('load-more').innerHTML =
-            "<a class='load-more-button' data-action='loadMore'>Load more</a>";
-  }
+  httpGet('./maxSize')
+      .then(
+          (response) => {
+            if (currentCount === JSON.parse(response)) {
+              heyId('load-more').innerHTML = '';
+            } else {
+              heyId('load-more').innerHTML =
+                  "<a class='load-more-button' data-action='loadMore'>Load more</a>";
+            }
+          }
+      );
 };
 const addOneMoreTagToList = (newTag, type, tagsToAddOrEdit) => {
   tagsToAddOrEdit.push(newTag.value);

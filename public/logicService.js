@@ -66,7 +66,6 @@ const logicService = (function () {
       if (action) action(event);
     });
     heyClass(document, 'search-tag').addEventListener('change', e => eventsOnChange(e));
-
   };
   document.addEventListener('DOMContentLoaded', documentReady);
 
@@ -81,24 +80,21 @@ const logicService = (function () {
     filterConfig.tags = [].slice.call(e.target.selectedOptions).map(a => a.value);
   };
   function tagsMenu() {
-    const tagsOptions = document.getElementsByClassName('search-tag')[0];
-    const customTags = articlesService.getTags();
-    tagsOptions.innerHTML = '';
-    for (const key in customTags) {
-     if (key!=='_id') tagsOptions.innerHTML += `<option>${key}</option>`;
-    }
-    tagsOptions.size = customTags.length;
+    httpGet('/getTags')
+          .then(
+              (response) => {
+                const customTags = JSON.parse(response);
+                const tagsOptions = document.getElementsByClassName('search-tag')[0];
+                tagsOptions.innerHTML = '';
+                for (const key in customTags) {
+                  if (key !== '_id') tagsOptions.innerHTML += `<option>${key}</option>`;
+                }
+                tagsOptions.size = customTags.length;
+              }
+          );
   }
   function init() {
-    const news = heyId('single-news-template');
-    const mas = articlesService.findArticles(currentCount, GLOBAL_STEP, filterConfig);
-    mas.forEach((item) => {
-      let singleNews = news.content.cloneNode(true);
-      singleNews = articlesModels.constructNews(singleNews, item);
-      heyId('data-content').appendChild(singleNews);
-    });
-    currentCount += mas.length;
-    optionForMainPage(currentCount);
+    articlesService.findArticles(currentCount, GLOBAL_STEP, filterConfig);
     tagsMenu();
   }
   const removeArticle = (article) => {
@@ -106,7 +102,6 @@ const logicService = (function () {
     if (articlesService.removeArticle(id)) {
       article.style.display = 'none';
       currentCount -= 1;
-      articlesService.toLocaleStorage();
     }
   };
   const clickToRemoveArticle = (crossButton) => {
@@ -115,14 +110,7 @@ const logicService = (function () {
     }
   };
   const addArticle = (myContent, url) => {
-    if (articlesService.createArticle(myContent) &&
-            articlesService.addNewImage(myContent.id, url)) {
-      alert('Успешно');
-      articlesService.toLocaleStorage();
-      document.location.href = '/';
-    } else {
-      alert('Что-то заполнено не так');
-    }
+    articlesService.createArticle(myContent, url);
   };
   const addNews = () => {
     const myContent = {};
@@ -130,7 +118,6 @@ const logicService = (function () {
     myContent.summary = heyId('add-summary-textarea').value;
     myContent.content = heyId('add-content-textarea').value;
     const url = heyId('add-url-textarea').value;
-    myContent.id = String(Math.floor(Math.random() * 1000));
     myContent.createdAt = new Date();
     myContent.author = globalUserName;
     myContent.tags = tagsToAddOrEdit;
@@ -141,21 +128,25 @@ const logicService = (function () {
   };
   const showOneNews = (customNode) => {
     const id = customNode.parentNode.dataset.id;
-    cleanPage();
-    let oneNews = heyId('one-news-template').content.cloneNode(true);
-    const article = Object.assign(articlesService.readArticle(id));
-    oneNews = articlesModels.constructOneNews(oneNews, article, id);
-    heyId('load-more').innerHTML = '';
-    heyId('data-content').insertBefore(oneNews, heyId('data-content').firstElementChild);
-    toggle({ 'link-main-page': true, myButton: false, 'link-add-news': false });
+    httpPost('/article', { id })
+        .then(
+            (response) => {
+              cleanPage();
+              let oneNews = heyId('one-news-template').content.cloneNode(true);
+              const article = JSON.parse(response, (key, value) => {
+                if (key === 'createdAt') return new Date(value);
+                return value;
+              });
+              oneNews = articlesModels.constructOneNews(oneNews, article, id);
+              heyId('load-more').innerHTML = '';
+              heyId('data-content').insertBefore(oneNews, heyId('data-content').firstElementChild);
+              toggle({ 'link-main-page': true, myButton: false, 'link-add-news': false });
+            },
+            error => alert(`Rejected: ${error}`)
+        );
   };
   const editArticle = (id, myContent, url) => {
-    if (articlesService.editArticle(myContent) && url.length >= 0) {
-      articlesService.changeImage(id, url);
-      alert('Успешно');
-      articlesService.toLocaleStorage();
-      document.location.href = '/';
-    } else alert('Что-то заполнено не так ');
+    articlesService.editArticle(myContent, url);
   };
   const editNews = (button) => {
     const id = button.dataset.id;
@@ -165,7 +156,7 @@ const logicService = (function () {
     myContent.content = heyId('change-content-textarea').value;
     myContent.tags = tagsToAddOrEdit;
     myContent.createdAt = new Date();
-    myContent.author = 'kostya';
+    myContent.author = globalUserName;
     myContent.id = id;
     const url = heyId('change-url-textarea').value;
     editArticle(id, myContent, url);
@@ -173,22 +164,36 @@ const logicService = (function () {
   const showWindowEditNews = (articleToEdit) => {
     tagsToAddOrEdit = [];
     const id = articleToEdit.parentNode.parentNode.dataset.id;
-    const article = Object.assign(articlesService.readArticle(id));
-    const image = articlesService.getImage(id);
-    heyId('change-title-textarea').innerHTML = article.title;
-    heyId('change-summary-textarea').innerHTML = article.summary;
-    heyId('change-content-textarea').innerHTML = article.content;
-    heyId('change-url-textarea').innerHTML = image;
-    heyId('edit-news-button').dataset.id = id;
-    for (let i = 0; i < article.tags.length; i += 1) {
-      const myP = document.createElement('p');
-      tagsToAddOrEdit.push(article.tags[i]);
-      myP.className = 'tags-to-add-or-edit';
-      myP.innerHTML = `# ${article.tags[i]}`;
-      myP.oncontextmenu = () => false;
-      myP.dataset.action = 'deleteTag';
-      heyId('edit-single-news').insertBefore(myP, heyId('edit-news-button'));
-    }
+    httpPost('/article', { id })
+        .then(
+            (response) => {
+              const article = JSON.parse(response, (key, value) => {
+                if (key === 'createdAt') return new Date(value);
+                return value;
+              });
+              heyId('change-title-textarea').innerHTML = article.title;
+              heyId('change-summary-textarea').innerHTML = article.summary;
+              heyId('change-content-textarea').innerHTML = article.content;
+              heyId('edit-news-button').dataset.id = id;
+              for (let i = 0; i < article.tags.length; i += 1) {
+                const myP = document.createElement('p');
+                tagsToAddOrEdit.push(article.tags[i]);
+                myP.className = 'tags-to-add-or-edit';
+                myP.innerHTML = `# ${article.tags[i]}`;
+                myP.oncontextmenu = () => false;
+                myP.dataset.action = 'deleteTag';
+                heyId('edit-single-news').insertBefore(myP, heyId('edit-news-button'));
+              }
+            },
+            error => alert(`Rejected: ${error}`)
+        );
+    httpPost('/image', { id })
+        .then(
+            (response) => {
+              heyId('change-url-textarea').innerHTML = response;
+              console.log(response);
+            }
+        );
   };
   const tagsToAddOrEditClick = (event) => {
     event.style.display = 'none';
@@ -207,12 +212,14 @@ const logicService = (function () {
     init();
   };
   const clearFilter = () => {
+    heyId('author-search').firstElementChild.value='';
+    heyId('date-search').firstElementChild.value='';
+    heyId('date-search').lastElementChild.value='';
     const InputSearchElements = heyTag(heyClass(document, 'search-panel'), 'input');
     [].forEach.call(InputSearchElements, elem => elem.value = '');
     filterConfig = { tags: [] };
   };
   return {
     init,
-
-  }
+  };
 }());

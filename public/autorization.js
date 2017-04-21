@@ -1,13 +1,13 @@
 const logoutClick = () => {
-    httpPost('/logout')
-        .then(
-            response=>{
-                checkLogin();
-                globalUserName = null;
-                document.location.href = '/';
-            },
-            error => alert(`Rejected: ${error}`)
-        );
+  httpPost('/logout')
+      .then(
+          (response) => {
+              checkLogin();
+              globalUserName = null;
+              document.location.href = '/';
+          },
+          error => alert(`Rejected: ${error}`)
+      );
 };
 const loginSubmitClick = () => {
   const body = {
@@ -16,7 +16,7 @@ const loginSubmitClick = () => {
   };
   httpPost('/login', body)
       .then(
-          response=> {
+          (response) => {
               checkLogin();
               heyId('link-login').click();
           },
@@ -24,21 +24,21 @@ const loginSubmitClick = () => {
       );
 };
 const checkLogin = () => {
-    httpGet('./user')
-        .then(
-            response => {
-                globalUserName = response;
-                setUserName();
-                currentCount = 0;
-                cleanPage();
-                logicService.init();
-            },
-            error=> {
-                currentCount = 0;
-                cleanPage();
-                logicService.init()
-            }
-        );
+  httpGet('./user')
+      .then(
+          (response) => {
+              globalUserName = response;
+              setUserName();
+              currentCount = 0;
+              cleanPage();
+              logicService.init();
+          },
+          (error) => {
+              currentCount = 0;
+              cleanPage();
+              logicService.init();
+          }
+      );
 };
 function httpPost(url, who) {
   return new Promise((resolve, reject) => {
@@ -47,15 +47,15 @@ function httpPost(url, who) {
     xhr.onerror = function () {
       reject(new Error('Network Error'));
     };
-    xhr.onreadystatechange = function () {
-        if (this.status === 200) {
-            resolve(this.response);
-        } else {
-            const error = new Error(this.statusText);
-            error.code = this.status;
-            reject(error);
-        }
-      };
+    xhr.onload = function () {
+      if (this.status === 200) {
+        resolve(xhr.responseText);
+      } else {
+        const error = new Error(this.statusText);
+        error.code = this.status;
+        reject(error);
+      }
+    };
     xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
     xhr.send(JSON.stringify(who));
   });

@@ -9,7 +9,12 @@ const articlesModels = (function () {
     const newsContent = singleNews.firstElementChild;
     newsContent.dataset.id = article.id;
     const singleNewsImage = heyClass(newsContent, 'image-header').firstElementChild;
-    singleNewsImage.src = articlesService.getImage(article.id);
+    httpPost('/image', { id: article.id })
+        .then(
+            (response) => {
+              singleNewsImage.src = response;
+            }
+        );
     heyTag(newsContent, 'h1').innerHTML = article.title;
     heyTag(newsContent, 'p').innerHTML = article.summary;
     heyClass(newsContent, 'author').innerHTML = article.author;
