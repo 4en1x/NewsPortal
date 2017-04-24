@@ -3,7 +3,7 @@ const logoutClick = () => {
       .then(
           (response) => {
               checkLogin();
-              globalUserName = null;
+              localStorage.removeItem("username");
               document.location.href = '/';
           },
           error => alert(`Rejected: ${error}`)
@@ -11,12 +11,13 @@ const logoutClick = () => {
 };
 const loginSubmitClick = () => {
   const body = {
-    name: heyId('login-name').value,
+    username: heyId('login-name').value,
     password: heyId('login-password').value,
   };
   httpPost('/login', body)
       .then(
           (response) => {
+              localStorage.setItem("username", response);
               checkLogin();
               heyId('link-login').click();
           },
@@ -24,21 +25,11 @@ const loginSubmitClick = () => {
       );
 };
 const checkLogin = () => {
-  httpGet('./user')
-      .then(
-          (response) => {
-              globalUserName = response;
-              setUserName();
-              currentCount = 0;
-              cleanPage();
-              logicService.init();
-          },
-          (error) => {
-              currentCount = 0;
-              cleanPage();
-              logicService.init();
-          }
-      );
+    globalUserName = localStorage.getItem("username")||null;
+    setUserName();
+    currentCount = 0;
+    cleanPage();
+    logicService.init();
 };
 function httpPost(url, who) {
   return new Promise((resolve, reject) => {
