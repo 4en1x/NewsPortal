@@ -4,6 +4,13 @@ const db = require('diskdb');
 const LocalStrategy = require('passport-local').Strategy;
 const passport = require('passport');
 const expressSession = require('express-session');
+const SessionStore = require('connect-diskdb')(expressSession);
+var options = {
+    path: `${__dirname}/public/JSON`, // path where the diskDB based file should be stored
+    name: 'sessions', // name of the database
+};
+var diskDBSessionStore = new SessionStore(options);
+
 
 const app = express();
 app.use(express.static('public'));
@@ -14,6 +21,7 @@ app.use(expressSession({
   secret: 'UFOSecret',
   resave: false,
   saveUninitialized: false,
+    store: diskDBSessionStore
 }));
 app.use(passport.initialize());
 app.use(passport.session({}));
