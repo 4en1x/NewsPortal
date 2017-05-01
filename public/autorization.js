@@ -17,7 +17,6 @@ const loginSubmitClick = () => {
   httpPost('/login', body)
       .then(
           (response) => {
-              localStorage.setItem("username", response);
               checkLogin();
               heyId('link-login').click();
           },
@@ -25,11 +24,23 @@ const loginSubmitClick = () => {
       );
 };
 const checkLogin = () => {
-    globalUserName = localStorage.getItem("username")||null;
-    setUserName();
-    currentCount = 0;
-    cleanPage();
-    logicService.init();
+    httpGet('/user')
+        .then(
+            (response) => {
+                globalUserName=response;
+                setUserName();
+                currentCount = 0;
+                cleanPage();
+                logicService.init();
+            },
+            error => {
+                globalUserName=null;
+                setUserName();
+                currentCount = 0;
+                cleanPage();
+                logicService.init();
+            }
+        );
 };
 function httpPost(url, who) {
   return new Promise((resolve, reject) => {
