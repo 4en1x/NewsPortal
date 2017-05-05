@@ -1,6 +1,6 @@
 {
   "name": "news-portal",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "just simple news portal",
   "main": "app.js",
   "repository": {
@@ -20,12 +20,13 @@
   "dependencies": {
     "body-parser": "^1.17.1",
     "connect-diskdb": "0.0.1",
-    "cookie-parser": "^1.4.3",
-    "diskdb": "^0.1.17",
+    "connect-mongo": "^1.3.2",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
     "express": "^4.15.2",
     "express-session": "^1.15.2",
+    "mongodb": "^2.2.26",
+    "mongoose": "^4.9.7",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0"
   },

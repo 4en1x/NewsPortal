@@ -7,14 +7,8 @@ const articlesModels = (function () {
   };
   function constructNews(singleNews, article) {
     const newsContent = singleNews.firstElementChild;
-    newsContent.dataset.id = article.id;
-    const singleNewsImage = heyClass(newsContent, 'image-header').firstElementChild;
-    httpPost('/image', { id: article.id })
-        .then(
-            (response) => {
-              singleNewsImage.src = response;
-            }
-        );
+    newsContent.dataset.id = article._id;
+    heyClass(newsContent, 'image-header').firstElementChild.src=article.url;
     heyTag(newsContent, 'h1').innerHTML = article.title;
     heyTag(newsContent, 'p').innerHTML = article.summary;
     heyClass(newsContent, 'author').innerHTML = article.author;

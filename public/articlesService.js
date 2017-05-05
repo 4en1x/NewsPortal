@@ -2,14 +2,17 @@ const articlesService = (function () {
   const MIN_DATE = new Date(-8640000000000000);
   const MAX_DATE = new Date(8640000000000000);
   function findArticles(skip = 0, top = 0, properties = {}) {
-    const author = properties.author || '';
     const beginDate = properties.beginDate || MIN_DATE;
     const endDate = properties.endDate || MAX_DATE;
+    const config = {};
+    if (properties.author) { config.author = properties.author; }
+    if (properties.tags.length > 0) { config.tags = { $all: properties.tags }; }
+    config.createdAt = {
+      $gte: beginDate,
+      $lte: endDate,
+    };
     const body = {
-      author,
-      beginDate,
-      endDate,
-      tags: properties.tags,
+      config,
       skip,
       top,
     };
@@ -33,7 +36,7 @@ const articlesService = (function () {
           );
   }
   function removeArticle(id) {
-    httpPost('/removeArticle', { _id: id })
+    httpPost('/removeArticle', { id })
         .then(
             (response) => {},
             error => alert(`Rejected: ${error}`)
@@ -63,19 +66,16 @@ const articlesService = (function () {
     if (article.tags.length <= 0) return false;
     return true;
   };
-  function editArticle(article, url) {
+  function editArticle(article) {
     if (validateArticle(article)) {
-      const id = article.id;
       const body = {
-        id: { _id: id },
         article,
-        url,
       };
       httpPost('/updateArticle', body)
           .then(
               (response) => {
-                  alert('Успешно');
-                  document.location.href = '/';
+                alert('Успешно');
+                document.location.href = '/';
               },
               error => alert(`Rejected: ${error}`)
           );

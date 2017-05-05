@@ -86,9 +86,9 @@ const logicService = (function () {
                 const customTags = JSON.parse(response);
                 const tagsOptions = document.getElementsByClassName('search-tag')[0];
                 tagsOptions.innerHTML = '';
-                for (const key in customTags) {
-                  if (key !== '_id') tagsOptions.innerHTML += `<option>${key}</option>`;
-                }
+                  customTags.forEach((item) => {
+                  if (item !== '_id') tagsOptions.innerHTML += `<option>${item}</option>`;
+              })
                 tagsOptions.size = customTags.length;
               }
           );
@@ -109,19 +109,19 @@ const logicService = (function () {
       removeArticle(crossButton.parentNode.parentNode);
     }
   };
-  const addArticle = (myContent, url) => {
-    articlesService.createArticle(myContent, url);
+  const addArticle = (myContent) => {
+    articlesService.createArticle(myContent);
   };
   const addNews = () => {
     const myContent = {};
     myContent.title = heyId('add-title-textarea').value;
     myContent.summary = heyId('add-summary-textarea').value;
     myContent.content = heyId('add-content-textarea').value;
-    const url = heyId('add-url-textarea').value;
+    myContent.url = heyId('add-url-textarea').value;
     myContent.createdAt = new Date();
     myContent.author = globalUserName;
     myContent.tags = tagsToAddOrEdit;
-    addArticle(myContent, url);
+    addArticle(myContent);
   };
   const checkToEnter = (event, type) => {
     if (event.keyCode === 13) addOneMoreTagToList(event.target, type, tagsToAddOrEdit);
@@ -145,8 +145,8 @@ const logicService = (function () {
             error => alert(`Rejected: ${error}`)
         );
   };
-  const editArticle = (id, myContent, url) => {
-    articlesService.editArticle(myContent, url);
+  const editArticle = (myContent) => {
+    articlesService.editArticle(myContent);
   };
   const editNews = (button) => {
     const id = button.dataset.id;
@@ -157,9 +157,9 @@ const logicService = (function () {
     myContent.tags = tagsToAddOrEdit;
     myContent.createdAt = new Date();
     myContent.author = globalUserName;
-    myContent.id = id;
-    const url = heyId('change-url-textarea').value;
-    editArticle(id, myContent, url);
+    myContent._id = id;
+    myContent.url = heyId('change-url-textarea').value;
+    editArticle(myContent);
   };
   const showWindowEditNews = (articleToEdit) => {
     tagsToAddOrEdit = [];
@@ -174,6 +174,7 @@ const logicService = (function () {
               heyId('change-title-textarea').innerHTML = article.title;
               heyId('change-summary-textarea').innerHTML = article.summary;
               heyId('change-content-textarea').innerHTML = article.content;
+                heyId('change-url-textarea').innerHTML=article.url;
               heyId('edit-news-button').dataset.id = id;
               for (let i = 0; i < article.tags.length; i += 1) {
                 const myP = document.createElement('p');
@@ -186,13 +187,6 @@ const logicService = (function () {
               }
             },
             error => alert(`Rejected: ${error}`)
-        );
-    httpPost('/image', { id })
-        .then(
-            (response) => {
-              heyId('change-url-textarea').innerHTML = response;
-              console.log(response);
-            }
         );
   };
   const tagsToAddOrEditClick = (event) => {
