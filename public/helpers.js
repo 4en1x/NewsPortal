@@ -39,7 +39,7 @@ const optionForMainPage = (currentCount) => {
   toggle({ myButton: true, 'link-main-page': false });
   const status = Boolean(globalUserName);
   toggle({ 'link-login': !status, 'link-logout': status, 'link-add-news': status });
-  httpGet('./maxSize')
+  http('GET', './maxSize')
       .then(
           (response) => {
             if (currentCount === JSON.parse(response)) {

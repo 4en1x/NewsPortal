@@ -80,7 +80,7 @@ const logicService = (function () {
     filterConfig.tags = [].slice.call(e.target.selectedOptions).map(a => a.value);
   };
   function tagsMenu() {
-    httpGet('/getTags')
+    http('GET', '/getTags')
           .then(
               (response) => {
                 const customTags = JSON.parse(response);
@@ -128,7 +128,7 @@ const logicService = (function () {
   };
   const showOneNews = (customNode) => {
     const id = customNode.parentNode.dataset.id;
-    httpPost('/article', { id })
+    http('POST', '/article', { id })
         .then(
             (response) => {
               cleanPage();
@@ -164,7 +164,7 @@ const logicService = (function () {
   const showWindowEditNews = (articleToEdit) => {
     tagsToAddOrEdit = [];
     const id = articleToEdit.parentNode.parentNode.dataset.id;
-    httpPost('/article', { id })
+    http('POST', '/article', { id })
         .then(
             (response) => {
               const article = JSON.parse(response, (key, value) => {

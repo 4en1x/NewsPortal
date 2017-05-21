@@ -1,5 +1,5 @@
 const logoutClick = () => {
-  httpPost('/logout')
+  http('DELETE', '/logout')
       .then(
           (response) => {
               checkLogin();
@@ -14,7 +14,7 @@ const loginSubmitClick = () => {
     username: heyId('login-name').value,
     password: heyId('login-password').value,
   };
-  httpPost('/login', body)
+  http('POST', '/login', body)
       .then(
           (response) => {
               checkLogin();
@@ -24,7 +24,7 @@ const loginSubmitClick = () => {
       );
 };
 const checkLogin = () => {
-    httpGet('/user')
+    http('GET','/user')
         .then(
             (response) => {
                 globalUserName=response;
@@ -42,16 +42,16 @@ const checkLogin = () => {
             }
         );
 };
-function httpPost(url, who) {
+function http(type, url, who) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', url, true);
+    xhr.open(type, url, true);
     xhr.onerror = function () {
       reject(new Error('Network Error'));
     };
     xhr.onload = function () {
       if (this.status === 200) {
-        resolve(xhr.responseText);
+        resolve(xhr.response);
       } else {
         const error = new Error(this.statusText);
         error.code = this.status;
@@ -62,22 +62,4 @@ function httpPost(url, who) {
     xhr.send(JSON.stringify(who));
   });
 }
-function httpGet(url) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false);
-    xhr.onload = function () {
-      if (this.status === 200) {
-        resolve(this.response);
-      } else {
-        const error = new Error(this.statusText);
-        error.code = this.status;
-        reject(error);
-      }
-    };
-    xhr.onerror = function () {
-      reject(new Error('Network Error'));
-    };
-    xhr.send();
-  });
-}
+

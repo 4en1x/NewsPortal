@@ -16,7 +16,7 @@ const articlesService = (function () {
       skip,
       top,
     };
-    httpPost('/articles', body)
+    http('POST', '/articles', body)
           .then(
               (response) => {
                 const news = heyId('single-news-template');
@@ -36,7 +36,7 @@ const articlesService = (function () {
           );
   }
   function removeArticle(id) {
-    httpPost('/removeArticle', { id })
+    http('DELETE', '/article', { id })
         .then(
             (response) => {},
             error => alert(`Rejected: ${error}`)
@@ -45,7 +45,7 @@ const articlesService = (function () {
   }
   function createArticle(article, url) {
     if (validateArticle(article)) {
-      httpPost('/createArticle', { article, url })
+      http('POST', '/createArticle', { article, url })
             .then(
                 (response) => {
                   alert('Успешно');
@@ -71,7 +71,7 @@ const articlesService = (function () {
       const body = {
         article,
       };
-      httpPost('/updateArticle', body)
+      http('PUT', '/article', body)
           .then(
               (response) => {
                 alert('Успешно');
